@@ -40,4 +40,37 @@ const deleteTransaction = async (req, res) => {
   }
 };
 
-module.exports = { createTransaction, getTransactions, deleteTransaction };
+const getMonthlySummary = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { year, month } = req.query; // ejemplo: ?year=2025&month=5
+
+    const start = new Date(year, month - 1, 1); // primer día del mes
+    const end = new Date(year, month, 1); // primer día del mes siguiente
+
+    const transacciones = await Transaction.find({
+      user: userId,
+      date: { $gte: start, $lt: end }
+    });
+
+    let ingresos = 0;
+    let gastos = 0;
+
+    transacciones.forEach(t => {
+      if (t.type === 'ingreso') ingresos += t.amount;
+      else if (t.type === 'gasto') gastos += t.amount;
+    });
+
+    res.status(200).json({
+      month,
+      year,
+      ingresos,
+      gastos,
+      balance: ingresos - gastos
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al calcular resumen mensual', error });
+  }
+};
+
+module.exports = { createTransaction, getTransactions, deleteTransaction, getMonthlySummary };
