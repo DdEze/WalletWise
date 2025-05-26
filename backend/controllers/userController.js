@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Transaction = require('../models/Transaction');
+const Category = require('../models/Category');
 const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {
@@ -25,8 +27,6 @@ const login = async (req, res) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(400).json({ message: 'Contraseña incorrecta' });
 
-    // const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
-    // const token = jwt.sign({ userId: user._id }, 'clave_secreta', { expiresIn: '1d' });
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: '1d'
     });
@@ -38,4 +38,21 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const deleteUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    await Transaction.deleteMany({ user: userId });
+
+    await Category.deleteMany({ user: userId });
+
+    await User.findByIdAndDelete(userId);
+
+    res.json({ message: 'Usuario y datos relacionados eliminados correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error);
+    res.status(500).json({ message: 'Error al eliminar usuario', error: error.message });
+  }
+};
+
+module.exports = { register, login, deleteUser };

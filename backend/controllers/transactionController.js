@@ -36,30 +36,25 @@ const updateTransaction = async (req, res) => {
     const transactionId = req.params.id;
     const userId = req.user.id;
 
-    // Buscar la transacción
     const transaction = await Transaction.findById(transactionId);
     if (!transaction) {
       return res.status(404).json({ message: 'Transacción no encontrada' });
     }
 
-    // Verificar que la transacción pertenezca al usuario
     if (transaction.user.toString() !== userId) {
       return res.status(403).json({ message: 'No autorizado para editar esta transacción' });
     }
 
     const { description, amount, date, type, category } = req.body;
 
-    // Validaciones básicas
     if (type && !['ingreso', 'gasto'].includes(type)) {
       return res.status(400).json({ message: 'Tipo de transacción inválido' });
     }
 
-    // Verificar que la categoría exista (opcional pero útil)
     if (category && !mongoose.Types.ObjectId.isValid(category)) {
       return res.status(400).json({ message: 'ID de categoría inválido' });
     }
 
-    // Actualizar campos permitidos
     if (description !== undefined) transaction.description = description;
     if (amount !== undefined) transaction.amount = amount;
     if (date !== undefined) transaction.date = date;
@@ -90,10 +85,10 @@ const deleteTransaction = async (req, res) => {
 const getMonthlySummary = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { year, month } = req.query; // ejemplo: ?year=2025&month=5
+    const { year, month } = req.query; 
 
-    const start = new Date(year, month - 1, 1); // primer día del mes
-    const end = new Date(year, month, 1); // primer día del mes siguiente
+    const start = new Date(year, month - 1, 1); 
+    const end = new Date(year, month, 1); 
 
     const transacciones = await Transaction.find({
       user: userId,

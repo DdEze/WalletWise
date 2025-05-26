@@ -2,26 +2,18 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const auth = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No se proporcionó token' });
-  }
-
-  const token = authHeader.split(' ')[1];
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId); // ⚠️ esto debe ser 'userId', no 'id'
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ message: 'No token, acceso denegado' });
 
-    if (!user) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(401).json({ message: 'Token inválido o usuario eliminado' });
 
     req.user = user;
     next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Token inválido o expirado' });
+  } catch (error) {
+    res.status(401).json({ message: 'Token inválido' });
   }
 };
 
