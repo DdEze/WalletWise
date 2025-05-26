@@ -1,4 +1,6 @@
 const Transaction = require('../models/Transaction');
+const Category = require('../models/Category');
+const mongoose = require('mongoose');
 
 // Crear nueva transacción
 const createTransaction = async (req, res) => {
@@ -26,6 +28,51 @@ const getTransactions = async (req, res) => {
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener transacciones', error });
+  }
+};
+
+const updateTransaction = async (req, res) => {
+  try {
+    const transactionId = req.params.id;
+    const userId = req.user.id;
+
+    // Buscar la transacción
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transacción no encontrada' });
+    }
+
+    // Verificar que la transacción pertenezca al usuario
+    if (transaction.user.toString() !== userId) {
+      return res.status(403).json({ message: 'No autorizado para editar esta transacción' });
+    }
+
+    const { description, amount, date, type, category } = req.body;
+
+    // Validaciones básicas
+    if (type && !['ingreso', 'gasto'].includes(type)) {
+      return res.status(400).json({ message: 'Tipo de transacción inválido' });
+    }
+
+    // Verificar que la categoría exista (opcional pero útil)
+    if (category && !mongoose.Types.ObjectId.isValid(category)) {
+      return res.status(400).json({ message: 'ID de categoría inválido' });
+    }
+
+    // Actualizar campos permitidos
+    if (description !== undefined) transaction.description = description;
+    if (amount !== undefined) transaction.amount = amount;
+    if (date !== undefined) transaction.date = date;
+    if (type !== undefined) transaction.type = type;
+    if (category !== undefined) transaction.category = category;
+
+    await transaction.save();
+
+    res.status(200).json({ message: 'Transacción actualizada', transaction });
+
+  } catch (error) {
+    console.error('Error al actualizar la transacción:', error);
+    res.status(500).json({ message: 'Error al actualizar la transacción', error: error.message });
   }
 };
 
@@ -102,4 +149,4 @@ const filterTransactions = async (req, res) => {
   }
 };
 
-module.exports = { createTransaction, getTransactions, deleteTransaction, getMonthlySummary, filterTransactions };
+module.exports = { createTransaction, getTransactions, deleteTransaction, updateTransaction, getMonthlySummary, filterTransactions };
