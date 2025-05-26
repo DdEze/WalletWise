@@ -73,4 +73,33 @@ const getMonthlySummary = async (req, res) => {
   }
 };
 
-module.exports = { createTransaction, getTransactions, deleteTransaction, getMonthlySummary };
+const filterTransactions = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { startDate, endDate, type, category } = req.query;
+
+    const query = { user: userId };
+
+    if (startDate && endDate) {
+      query.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+
+    if (type) {
+      query.type = type; 
+    }
+
+    if (category) {
+      query.category = category; 
+    }
+
+    const transacciones = await Transaction.find(query).populate('category');
+    res.status(200).json(transacciones);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al filtrar transacciones', error });
+  }
+};
+
+module.exports = { createTransaction, getTransactions, deleteTransaction, getMonthlySummary, filterTransactions };
