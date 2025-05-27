@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Category = require('../models/Category');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const register = async (req, res) => {
   try {
@@ -55,4 +56,34 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { register, login, deleteUser };
+const logout = (req, res) => {
+  res.status(200).json({ message: 'Sesión cerrada correctamente' });
+};
+
+const changePassword = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    const { currentPassword, newPassword } = req.body;
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Contraseña actual incorrecta" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashed = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashed;
+    await user.save();
+
+    res.json({ message: "Contraseña actualizada correctamente" });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error al cambiar la contraseña",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { register, login, deleteUser, logout,changePassword };

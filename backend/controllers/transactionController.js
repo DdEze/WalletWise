@@ -144,4 +144,20 @@ const filterTransactions = async (req, res) => {
   }
 };
 
-module.exports = { createTransaction, getTransactions, deleteTransaction, updateTransaction, getMonthlySummary, filterTransactions };
+const getBalance = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ user: req.user.id });
+
+    const balance = transactions.reduce((acc, tx) => {
+      return tx.type === 'ingreso'
+        ? acc + tx.amount
+        : acc - tx.amount;
+    }, 0);
+
+    res.status(200).json({ balance });
+  } catch (error) {
+    res.status(500).json({ message: 'Error al calcular el balance', error: error.message });
+  }
+};
+
+module.exports = { createTransaction, getTransactions, deleteTransaction, updateTransaction, getMonthlySummary, filterTransactions, getBalance };
