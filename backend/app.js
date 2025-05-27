@@ -8,6 +8,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+require('dotenv').config();
 
 app.use('/api/users', userRoutes);
 app.use('/api/transactions', transactionRoutes);

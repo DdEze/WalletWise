@@ -2,13 +2,11 @@ const Transaction = require('../models/Transaction');
 const Category = require('../models/Category');
 const mongoose = require('mongoose');
 
-// Crear nueva transacción
 const createTransaction = async (req, res) => {
   try {
-    const { type, amount, category, description, date } = req.body;
+    const { amount, category, description, date } = req.body;
     const transaction = new Transaction({
       user: req.user.id,
-      type,
       amount,
       category,
       description,
@@ -45,11 +43,7 @@ const updateTransaction = async (req, res) => {
       return res.status(403).json({ message: 'No autorizado para editar esta transacción' });
     }
 
-    const { description, amount, date, type, category } = req.body;
-
-    if (type && !['ingreso', 'gasto'].includes(type)) {
-      return res.status(400).json({ message: 'Tipo de transacción inválido' });
-    }
+    const { description, amount, date, category } = req.body;
 
     if (category && !mongoose.Types.ObjectId.isValid(category)) {
       return res.status(400).json({ message: 'ID de categoría inválido' });
@@ -58,7 +52,6 @@ const updateTransaction = async (req, res) => {
     if (description !== undefined) transaction.description = description;
     if (amount !== undefined) transaction.amount = amount;
     if (date !== undefined) transaction.date = date;
-    if (type !== undefined) transaction.type = type;
     if (category !== undefined) transaction.category = category;
 
     await transaction.save();
@@ -85,22 +78,27 @@ const deleteTransaction = async (req, res) => {
 const getMonthlySummary = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { year, month } = req.query; 
+    const { year, month } = req.query;
 
-    const start = new Date(year, month - 1, 1); 
-    const end = new Date(year, month, 1); 
+    // Definir rango de fechas
+    const start = new Date(year, month - 1, 1);
+    const end   = new Date(year, month, 1);
 
-    const transacciones = await Transaction.find({
-      user: userId,
-      date: { $gte: start, $lt: end }
-    });
+    // Traer transacciones del mes con la categoría poblada
+    const transacciones = await Transaction
+      .find({
+        user: userId,
+        date: { $gte: start, $lt: end }
+      })
+      .populate('category', 'type');
 
     let ingresos = 0;
-    let gastos = 0;
+    let gastos   = 0;
 
-    transacciones.forEach(t => {
-      if (t.type === 'ingreso') ingresos += t.amount;
-      else if (t.type === 'gasto') gastos += t.amount;
+    // Sumar/restar según el tipo de la categoría
+    transacciones.forEach(tx => {
+      if (tx.category.type === 'ingreso') ingresos += tx.amount;
+      else if (tx.category.type === 'gasto')   gastos   += tx.amount;
     });
 
     res.status(200).json({
@@ -111,51 +109,62 @@ const getMonthlySummary = async (req, res) => {
       balance: ingresos - gastos
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error al calcular resumen mensual', error });
+    console.error('Error al calcular resumen mensual:', error);
+    res.status(500).json({
+      message: 'Error al calcular resumen mensual',
+      error: error.message
+    });
   }
 };
 
 const filterTransactions = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId   = req.user.id;
     const { startDate, endDate, type, category } = req.query;
-
-    const query = { user: userId };
+    const query    = { user: userId };
 
     if (startDate && endDate) {
       query.date = {
         $gte: new Date(startDate),
-        $lte: new Date(endDate)
+        $lte: new Date(endDate),
       };
-    }
-
-    if (type) {
-      query.type = type; 
     }
 
     if (category) {
       query.category = category; 
     }
+    else if (type) {
+      const cats = await Category.find({ user: userId, type }).select('_id');
+      const catIds = cats.map(c => c._id);
+      query.category = { $in: catIds };
+    }
 
-    const transacciones = await Transaction.find(query).populate('category');
+    const transacciones = await Transaction
+      .find(query)
+      .populate('category', 'name type');
+
     res.status(200).json(transacciones);
   } catch (error) {
-    res.status(500).json({ message: 'Error al filtrar transacciones', error });
+    console.error(error);
+    res.status(500).json({ message: 'Error al filtrar transacciones', error: error.message });
   }
 };
 
 const getBalance = async (req, res) => {
   try {
-    const transactions = await Transaction.find({ user: req.user.id });
+    const transactions = await Transaction
+      .find({ user: req.user.id })
+      .populate('category', 'type');
 
     const balance = transactions.reduce((acc, tx) => {
-      return tx.type === 'ingreso'
+      return tx.category.type === 'ingreso'
         ? acc + tx.amount
         : acc - tx.amount;
     }, 0);
 
     res.status(200).json({ balance });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Error al calcular el balance', error: error.message });
   }
 };

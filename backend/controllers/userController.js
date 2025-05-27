@@ -7,15 +7,23 @@ const bcrypt = require('bcryptjs');
 const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'Todos los campos son obligatorios' });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'El email ya está registrado' });
-
     const user = new User({ username, email, password });
     await user.save();
 
-    res.status(201).json({ message: 'Usuario creado exitosamente' });
+    const SECRET = process.env.JWT_SECRET;
+    const token = jwt.sign({ id: user._id }, SECRET, { expiresIn: '1d' });
+
+    res.status(201).json({ token });
   } catch (error) {
-    res.status(500).json({ message: 'Error al registrar usuario', error });
+    console.error('Error en register:', error);
+    res.status(500).json({ message: 'Error al registrar usuario' });
   }
 };
 
