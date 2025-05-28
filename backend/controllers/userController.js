@@ -6,19 +6,21 @@ const bcrypt = require('bcryptjs');
 
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    
-    if (!username || !email || !password) {
+    const { firstName, lastName, email, password } = req.body;
+
+    if (!firstName || !lastName || !email || !password) {
       return res.status(400).json({ message: 'Todos los campos son obligatorios' });
     }
 
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'El email ya está registrado' });
-    const user = new User({ username, email, password });
+
+    // No hagas hash aquí — el modelo lo hará automáticamente
+    const user = new User({ firstName, lastName, email, password });
+
     await user.save();
 
-    const SECRET = process.env.JWT_SECRET;
-    const token = jwt.sign({ id: user._id }, SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
     res.status(201).json({ token });
   } catch (error) {
@@ -33,15 +35,14 @@ const login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: 'Contraseña incorrecta' });
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: '1d'
     });
 
-
-    res.status(200).json({ token, user: { id: user._id, username: user.username, email: user.email } });
+    res.status(200).json({ token, user: { id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email } });
   } catch (error) {
     res.status(500).json({ message: 'Error al iniciar sesión', error });
   }
