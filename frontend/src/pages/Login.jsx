@@ -2,6 +2,7 @@ import { useState } from 'react';
 import api from '../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import '../css/login.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -21,12 +22,28 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Iniciar Sesión</h2>
-      <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-      <input placeholder="Contraseña" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-      <button type="submit">Entrar</button>
-      <p>¿No tenés cuenta? <Link to="/register">Registrate acá</Link></p>
-    </form>
+    <div className="login-container">
+      <h1 className="project-title">WalletWise</h1>
+
+      <form className="login-form" onSubmit={handleSubmit}>
+        <h2>Iniciar Sesión</h2>
+        <input
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          placeholder="Contraseña"
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Entrar</button>
+        <p>¿No tenés cuenta? <Link to="/register">Registrate acá</Link></p>
+      </form>
+    </div>
   );
 }

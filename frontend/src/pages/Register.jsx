@@ -2,9 +2,11 @@ import { useState } from 'react';
 import api from '../services/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import '../css/register.css'; 
 
 export default function Register() {
-  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -12,7 +14,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/users/register', { username, email, password });
+      const res = await api.post('/users/register', { firstName, lastName, email, password });
       
       if (res.data.token) {
         localStorage.setItem('token', res.data.token);
@@ -29,31 +31,41 @@ export default function Register() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Registrar Usuario</h2>
-      <input
-        type="text"
-        placeholder="Nombre de usuario"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-        required
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Contraseña"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        required
-      />
-      <button type="submit">Registrar</button>
-      <p>¿Ya tenés una cuenta? <Link to="/login">Volver al inicio de sesión</Link></p>
-    </form>
+    <div className="register-container">
+      <h1 className="project-title">WalletWise</h1>
+      <form className="register-form" onSubmit={handleSubmit}>
+        <h2>Registrar Usuario</h2>
+        <input
+          type="text"
+          placeholder="Nombre"
+          value={firstName}
+          onChange={e => setFirstName(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Apellido"
+          value={lastName}
+          onChange={e => setLastName(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Registrar</button>
+        <p>¿Ya tenés una cuenta? <Link to="/login">Volver al inicio de sesión</Link></p>
+      </form>
+    </div>
   );
 }

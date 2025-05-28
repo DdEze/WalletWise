@@ -1,0 +1,97 @@
+.transactions-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px;
+  color: #fff;
+}
+
+.transactions-container h2 {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.transactions-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.transactions-form input,
+.transactions-form select,
+.transactions-form textarea {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.transactions-form textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* Filtros */
+.filters {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.filter-fields {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Lista de transacciones */
+.transactions-list li {
+  margin-bottom: 12px;
+  padding: 10px;
+  background-color: #2d2d2d;
+  border-radius: 8px;
+  list-style: none;
+}
+
+.transactions-list strong {
+  color: #ffdd57;
+}
+
+.transactions-list button {
+  margin-left: 8px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.transactions-list button:hover {
+  opacity: 0.9;
+}
+
+.transactions-list button:nth-child(2) {
+  background: none;
+  border: none;
+  color: #ffc107;
+  cursor: pointer;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.transactions-list button:nth-child(3) {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}

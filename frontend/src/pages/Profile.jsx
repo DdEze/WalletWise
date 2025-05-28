@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../services/api';
+import '../css/profile.css';
 
 export default function Profile() {
   const [currentPassword, setCurrent] = useState('');
@@ -32,9 +33,9 @@ export default function Profile() {
   };
 
   return (
-    <div>
+    <div className="profile-container">
       <h2>Perfil</h2>
-      <form onSubmit={handleChange} style={{ marginBottom: 16 }}>
+      <form onSubmit={handleChange} className="profile-form">
         <input
           type="password"
           placeholder="Contraseña actual"
@@ -52,10 +53,7 @@ export default function Profile() {
         <button type="submit">Cambiar contraseña</button>
       </form>
 
-      <button 
-        onClick={handleDelete} 
-        style={{ backgroundColor: 'red', color: 'white', padding: '8px 12px', border: 'none', cursor: 'pointer' }}
-      >
+      <button onClick={handleDelete} className="delete-account-btn">
         Eliminar cuenta
       </button>
     </div>

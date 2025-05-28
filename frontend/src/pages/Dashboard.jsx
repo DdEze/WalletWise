@@ -53,19 +53,33 @@ export default function Dashboard() {
   };
 
   return (
-    <div>
+    <div className="dashboard-container">
       <h2>Dashboard</h2>
-      <p><strong>Balance total:</strong> ${balance}</p>
+      <div className="dashboard-balance">
+        <p><strong>Balance total:</strong> ${balance}</p>
+      </div>
 
-      <div style={{ maxWidth: 600, marginTop: 24 }}>
-        <Bar data={data} 
-             options={{
-               responsive: true,
-               plugins: {
-                 legend: { position: 'top' },
-                 title: { display: true, text: 'Resumen Mensual' }
-               }
-             }} />
+      <div className="chart-card">
+        <Bar
+          data={data}
+          options={{
+            responsive: true,
+            plugins: {
+              legend: { position: 'top', labels: { color: '#fff' } },
+              title: { display: true, text: 'Resumen Mensual', color: '#fff' },
+            },
+            scales: {
+              x: {
+                ticks: { color: '#ccc' },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+              },
+              y: {
+                ticks: { color: '#ccc' },
+                grid: { color: 'rgba(255,255,255,0.1)' },
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );

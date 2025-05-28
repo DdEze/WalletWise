@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import '../css/categories.css';
 
 export default function Categories() {
   const [categories, setCategories] = useState([]);
@@ -38,23 +39,26 @@ export default function Categories() {
   if (loading) return <p>Cargando categorías…</p>;
 
   return (
-    <div>
+    <div className="categories-container">
       <h2>Categorías</h2>
-      <form onSubmit={handleCreate} style={{ marginBottom: 16 }}>
-        <input placeholder="Nombre" value={name} onChange={e=>setName(e.target.value)} required />
-        <select value={type} onChange={e=>setType(e.target.value)}>
+      <form onSubmit={handleCreate} className="categories-form">
+        <input
+          placeholder="Nombre"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          required
+        />
+        <select value={type} onChange={e => setType(e.target.value)}>
           <option value="ingreso">Ingreso</option>
           <option value="gasto">Gasto</option>
         </select>
         <button type="submit">Crear</button>
       </form>
-      <ul>
-        {categories.map(c=>(
-          <li key={c._id} style={{ marginBottom: 8 }}>
+      <ul className="categories-list">
+        {categories.map(c => (
+          <li key={c._id}>
             <strong>{c.name}</strong> ({c.type})
-            <button onClick={()=>handleDelete(c._id)} style={{ marginLeft: 8, color: 'red' }}>
-              Eliminar
-            </button>
+            <button onClick={() => handleDelete(c._id)}>Eliminar</button>
           </li>
         ))}
       </ul>
