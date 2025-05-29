@@ -1,14 +1,11 @@
 # WalletWise
-## Proyecto de Gestión de Transacciones con React, MongoDB y Chart.js
 
-![Build Status](https://github.com/tu-usuario/tu-repo/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Last Commit](https://img.shields.io/github/last-commit/tu-usuario/tu-repo)
-![Issues](https://img.shields.io/github/issues/tu-usuario/tu-repo)
-![PRs](https://img.shields.io/github/issues-pr/tu-usuario/tu-repo)
 ![React Version](https://img.shields.io/badge/react-18.2.0-blue)
 ![MongoDB](https://img.shields.io/badge/mongodb-4.4-green)
 ![Node.js](https://img.shields.io/badge/node-%3E=16.0.0-brightgreen)
+[![JavaScript](https://img.shields.io/badge/javascript-ES6+-yellow?logo=javascript&style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![HTML](https://img.shields.io/badge/html5-HTML-orange?logo=html5&style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS](https://img.shields.io/badge/css3-CSS-blue?logo=css3&style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/CSS)
 
 ## Descripción
 
@@ -50,7 +47,7 @@ Aplicación web para administrar transacciones financieras y categorías, con fu
     ```bash
     npm run dev
 
-## Frontend
+### Frontend
 
 1. Entrar en la carpeta frontend:
     ```bash
@@ -88,11 +85,15 @@ Aplicación web para administrar transacciones financieras y categorías, con fu
 ```
 ## Endpoints API Principales
 
+### Categorías
+
 - GET /api/categories — Listar categorías
 
 - POST /api/categories — Crear categoría
 
 - DELETE /api/categories/:id — Eliminar categoría
+
+### Transacciones
 
 - GET /api/transactions — Listar transacciones
 
@@ -102,9 +103,23 @@ Aplicación web para administrar transacciones financieras y categorías, con fu
 
 - DELETE /api/transactions/:id — Eliminar transacción
 
-- PUT /api/users/change-password — Cambiar contraseña usuario
+- GET /api/transactions/filter — Filtrar transacciones
 
-- DELETE /api/users/me — Eliminar cuenta usuario
+- GET /api/transactions/summary/monthly — Resumen mensual de transacciones
+
+- GET /api/transactions/balance — Obtener balance actual
+
+### Usuarios
+
+- POST /api/users/register — Registrar nuevo usuario
+
+- POST /api/users/login — Iniciar sesión
+
+- POST /api/users/logout — Cerrar sesión
+
+- PUT /api/users/change-password — Cambiar contraseña del usuario
+
+- DELETE /api/users/me — Eliminar cuenta de usuario
 
 ## Configuración adicional
 
@@ -130,5 +145,6 @@ Dependencias principales
 
 - jsonwebtoken (para autenticación JWT)
 
-## MIT License
-Copyright (c) 2025 [De Dominicis, Ezequiel Anibal]
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
